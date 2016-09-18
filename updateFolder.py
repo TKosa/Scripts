@@ -1,17 +1,9 @@
-"""About: Copy's new files from A to B that are not in B. If a file is in B not A delete it.
-"""
-
 import os, shutil
-
-path="C:\Users\Thomas\Desktop\Tom\images\POGO"
-pathA="C:\Users\Thomas\Desktop\Tom\images\POGO\\A"
-pathB="C:\Users\Thomas\Desktop\Tom\images\POGO\\B"
-
 
 def update(src,dst):
     """Updates dst from src. Recursively copies all subdirectories and files of src if they are not in dst or are out of date.
        Also removes files in dst that are not in src.
-          src (str): directory or file path
+          src (str): directory path or file path
           dst (str): directory path
     """
     if os.path.isfile(src):
@@ -45,6 +37,7 @@ def copyfile(src,dst):
         if os.stat(src).st_mtime>os.stat(dst+"\\"+filename).st_mtime:
             #If src file has been modified more recently, copy it
             shutil.copy2(src,dst)
+        #If the file exists in dst but is more recent than the src version, return without copying over
         return
     #If src not in dst, copy it
     shutil.copy2(src,dst)
@@ -66,4 +59,4 @@ def main():
     update(path1,path2)
 
 if __name__=="__main__":
-    pass
+    main()
