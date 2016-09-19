@@ -19,7 +19,7 @@ def update(src,dst):
             #If the foldername of src is in dst, remove content that is in dst's copy of src, but not in src
             for x in os.listdir(dst+'\\'+foldername):
                 if x not in os.listdir(src):
-                    os.remove(dst+'\\'+foldername+"\\"+x)
+                    remove(dst+'\\'+foldername+"\\"+x)
             #Then update what copy what IS in src to dst (checking for time modified)
             for x in os.listdir(src):
                 update(src+"\\"+x, dst+"\\"+foldername)
@@ -42,7 +42,6 @@ def copyfile(src,dst):
     #If src not in dst, copy it
     shutil.copy2(src,dst)
 
-
 def get_path_input(msg):
     """Returns valid path for file or directory through sanitized user input"""
     path = raw_input(msg)
@@ -53,10 +52,20 @@ def get_path_input(msg):
             print("path has been selected")
             return path
 
+def remove(path):
+    """Remove file or folder from PC."""
+    if os.path.isfile(path):
+        os.remove(path)
+    if os.path.isdir(path):
+        for y in os.listdir(path):
+            remove(path+"\\"+y)
+        os.rmdir(path)
+
 def main():
-    path1=get_path_input("Enter the path of the updated version")
-    path2=get_path_input("Enter the path of the file which is to be updated")
+    path1=get_path_input("Enter the path of the updated version ")
+    path2=get_path_input("Enter the path where the file/folder to be updated resides in ")
     update(path1,path2)
+    raw_input("Process Complete. Press enter to exit. ")
 
 if __name__=="__main__":
     main()
