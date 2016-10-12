@@ -1,5 +1,7 @@
 import os, shutil
-
+#TODO: Have a function determine the size of a file using os.stat(path)[6] . Then have the system
+#Keep track of its progress and display whenever a file has been proccessed AND its % counter
+#has gone up to the next integer
 def update(src,dst):
     """Updates dst from src. Recursively copies all subdirectories and files of src if they are not in dst or are out of date.
        Also removes files in dst that are not in src.
@@ -14,6 +16,7 @@ def update(src,dst):
         foldername=src.split("\\")[-1]
         if foldername not in os.listdir(dst):
             #If the folder isn't in dst copy it
+            print ("Copying: " + foldername)
             shutil.copytree(src,dst+"\\"+foldername)
         else:
             #If the foldername of src is in dst, remove content that is in dst's copy of src, but not in src
@@ -23,6 +26,7 @@ def update(src,dst):
             #Then update what copy what IS in src to dst (checking for time modified)
             for x in os.listdir(src):
                 update(src+"\\"+x, dst+"\\"+foldername)
+        print (src + " has been proccessed")
 
     else:
         print("not a folder or a file!?")
@@ -36,6 +40,7 @@ def copyfile(src,dst):
         #If the file exists in dst then check for time modified
         if os.stat(src).st_mtime>os.stat(dst+"\\"+filename).st_mtime:
             #If src file has been modified more recently, copy it
+            print ('Copying: '+ filename)
             shutil.copy2(src,dst)
         #If the file exists in dst but is more recent than the src version, return without copying over
         return
@@ -60,6 +65,16 @@ def remove(path):
         for y in os.listdir(path):
             remove(path+"\\"+y)
         os.rmdir(path)
+
+def date_of_last(path):
+    """Returns most recent time that the file or a content of the folder was modified"""
+    if os.path.isfile(path):
+        return os.stat(path)[8]
+    if os.path.isdir(path):
+        if len(os.listdir(path))>0:
+            return max([date_of_last(path+"\\"+x) for x in os.listdir(path)])
+        else:
+            return 0
 
 def main():
     path1=get_path_input("Enter the path of the updated version ")
