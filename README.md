@@ -9,4 +9,4 @@ If files already exist in dest it'll check the date modified, and have the most 
 
 Comes with a cute little gui I call beepo. He likes snakes.
 
-<img src="https://github.com/TKosa/Update-Folder/blob/master/beepo.png">
+<img src="https://github.com/TKosa/Update-Folder/blob/master/beepo.png" width="500">

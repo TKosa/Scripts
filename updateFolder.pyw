@@ -135,7 +135,7 @@ def gui(src="Path of Src Directory",dst="Path of Destination Directory"):
         run_button.config(command = run_btn)
 
     root=tk.Tk()
-    root.title("Directory Chooser")
+    root.title("Beepo")
 
     top_label=tk.Label(root)
     top_left=tk.Label(top_label,width=60)
