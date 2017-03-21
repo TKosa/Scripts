@@ -8,3 +8,5 @@ This script takes two paths src and dest, and copies files and folders from src 
 If files already exist in dest it'll check the date modified, and have the most recently modified file stay/be-copied-into dest.
 
 Comes with a cute little gui I call beepo. He likes snakes.
+
+<img src="https://github.com/TKosa/Update-Folder/blob/master/beepo.png" width="200" height="200" style="vertical-align:middle">
