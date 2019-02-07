@@ -25,8 +25,7 @@ def update(src,dst):
         return
 
     if(src.find('git\\object')!=-1):
-        #A permission error with git dirs often occurs. I dont need git files that much lol, so they wont be copied over.
-        #I know I know I'm a waste of space and a terrible programmer. Thanks mom.
+        #A permission error with git dirs often occurs. I dont need git files that much so they wont be copied over for now.
         return
 
     for item in os.listdir(dst):
@@ -43,7 +42,7 @@ def update(src,dst):
             if os.path.isfile(Item):
                 copyfile(Item,dst)
             if os.path.isdir(Item):
-                print('copying 3' + Item)
+                print('copying' + Item)
                 shutil.copytree(Item,dst+'\\'+item)
 
 
@@ -112,6 +111,7 @@ def date_of_last(path):
             return max([date_of_last(path+"\\"+x) for x in os.listdir(path)])
         else:
             return 0
+
 def gui(src="Path of Src Directory",dst="Path of Destination Directory"):
     #This Probably deserves its own file, but having the entire app be exactly 2 files is awkward so here we are
     import Tkinter as tk
