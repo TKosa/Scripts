@@ -76,10 +76,10 @@ def copyfile(src,dst):
 
 def get_path_input(msg):
     """Returns valid path for file or directory through sanitized user input"""
-    path = raw_input(msg)
+    path = input(msg)
     while True:
         if not os.access(path,os.F_OK):
-            path = raw_input("path was invalid or permission not granted, please enter a valid path")
+            path = input("path was invalid or permission not granted, please enter a valid path")
         else:
             print("path has been selected")
             return path

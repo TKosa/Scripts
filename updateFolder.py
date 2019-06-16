@@ -1,10 +1,11 @@
 import os
 from utilityFns import *
+import tkinter as tk
+from tkinter.filedialog import askdirectory
+
 
 def gui(src="Path of Src Directory",dst="Path of Destination Directory"):
 
-    import Tkinter as tk
-    from tkFileDialog import askdirectory
 
 
     def choose_src():
@@ -26,7 +27,6 @@ def gui(src="Path of Src Directory",dst="Path of Destination Directory"):
 
     root=tk.Tk()
     root.title("Update-Folder")
-    tk.La
     top_label=tk.Label(root)
     top_left=tk.Label(top_label,width=60)
     top_left.config(text=src,bg="white")
