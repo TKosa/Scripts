@@ -2,12 +2,15 @@ import os
 from utilityFns import *
 from tkinter import *
 from tkinter.filedialog import askdirectory
+src = "C:/Users/Thomas/Desktop/github/Update-Folder/testA"
+dst = "C:/Users/Thomas/Desktop/github/Update-Folder/testB"
 
 class Application(Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
         self.input_frame = InputFrame(self)
+        self.output_frame=None
 
         #TODO add event log
         self.grid(sticky="news")
@@ -27,8 +30,17 @@ class Application(Frame):
 
         runBtn.config(text='Running')
 
-        self.output_frame = OutputFrame(self, src, dst).pack(fill=X)
-        #update(src, dst)
+        changes = update(src, dst)
+        print(changes)
+
+        try:
+            self.output_frame.destroy()
+        except AttributeError:
+            pass
+        self.output_frame = OutputFrame(self, src, dst)
+        self.output_frame.pack(fill=X)
+
+
 
         runBtn.config(text='Run')
         runBtn.config(command=self.run)
@@ -38,8 +50,8 @@ class InputFrame(Frame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.src_row = self.SelectDirectoryRow(self, "Set Src", "C:\\Users\\Thomas\\Desktop\\github\\Update-Folder\\testA")
-        self.dst_row = self.SelectDirectoryRow(self, "Set Dst", "C:\\Users\\Thomas\\Desktop\\github\\Update-Folder\\testB")
+        self.src_row = self.SelectDirectoryRow(self, "Set Src", "C:/Users/Thomas/Desktop/github/Update-Folder/testA")
+        self.dst_row = self.SelectDirectoryRow(self, "Set Dst", "C:/Users/Thomas/Desktop/github/Update-Folder/testB")
 
         self.runBtn = Button(self, text="Run", command=master.run)
         self.runBtn.pack()
@@ -67,23 +79,20 @@ class InputFrame(Frame):
 class OutputFrame(Frame):
     #Container for both viewer widgets
 
-    def __init__(self, master, src, dst):
+    def __init__(self, master, folder):
         super().__init__(master, bg="white")
 
-        src_viewer = self.FolderViewer(self, src, 0)
-        dst_viewer = self.FolderViewer(self, dst, 1)
-
+        self.FV = self.FolderViewer(self, folder)
 
 
     class FolderViewer():
         """
-        Shows folder and subfolders
-            updates in real time as app makes changes
+        Shows folder and subfolders after app has run
         Highlights differences
             removed files shown in red, added in green, modified in yellow
 
         """
-        def __init__(self, master, path, colNum):
+        def __init__(self, master, path):
             self.master=master
 
             list_of_subdirs = []
@@ -91,19 +100,15 @@ class OutputFrame(Frame):
             rowNum = 0
 
             for file in list_of_subdirs:
-                self.addEntry(file, rowNum, colNum)
+                self.addEntry(file, rowNum)
                 rowNum += 1
 
-
-
-
-
-        def addEntry(self, path, rowNum, colNum):
-            self.Entry(self.master, path, rowNum, colNum)
+        def addEntry(self, path, rowNum):
+            self.Entry(self.master, path, rowNum)
             #self.master.rowconfigure(rowNum,weight=1)
 
         class Entry:
-            def __init__(self, master, path, rowNum, colNum, spaces=0):
+            def __init__(self, master, path, rowNum, spaces=0):
                 filename = os.path.basename(path)
 
                 # Button to display filetype (file or directory), and to expand/collapse if dir
@@ -112,15 +117,15 @@ class OutputFrame(Frame):
                     self.button['image'] = closedFolderImage
                 elif os.path.isfile(path):
                     self.button['image'] = fileImage
-                self.button.grid(row=rowNum, column=4*colNum, sticky=W)
+                self.button.grid(row=rowNum, column=0, sticky=W)
 
                 #print("button", path, rowNum, 2*colNum)
 
 
                 #filename label
                 self.nameLabel = Label(master, text=filename, bg="white")
-                self.nameLabel.grid(row=rowNum,column=4*colNum+1, sticky="EW")
-                self.nameLabel.grid_columnconfigure(4*colNum+1,weight=1)
+                self.nameLabel.grid(row=rowNum,column=1, sticky="EW")
+                #self.nameLabel.grid_columnconfigure(4*colNum+1,weight=1)
                 #print("Label", path, rowNum, 2*colNum+1)
 
 
