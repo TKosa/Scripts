@@ -109,3 +109,10 @@ def date_of_last(path):
             return max([date_of_last(path+"\\"+x) for x in os.listdir(path)])
         else:
             return 0
+
+def populate_list_of_subdirectories(dir,list):
+    for file in os.listdir(dir):
+        path = dir+"\\"+file
+        list.append(path)
+        if os.path.isdir(path):
+            populate_list_of_subdirectories(path,list)
