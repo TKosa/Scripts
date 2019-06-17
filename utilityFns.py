@@ -2,8 +2,7 @@ import os,shutil
 """ TODO: Have a function determine the size of a file using os.stat(path)[6] . Then have the system
  Keep track of its progress and display whenever a file has been proccessed AND its % counter
  has gone up to the next integer """
-global changes
-changes = []
+
 
 def update(src,dst, changes=[]):
     """Updates directory dst from src. Recursively copies all subdirectories and files of src if they are not in dst or are out of date.
@@ -27,7 +26,7 @@ def update(src,dst, changes=[]):
         if item not in srcfiles:
                 dstpath = dst+'/'+item
                 remove(dstpath)
-                changes.append((dstpath,"remove"))
+                changes[dstpath] = "remove"
 
     # If the item is in src but not dst, copy it over
     for item in os.listdir(src):
@@ -38,7 +37,7 @@ def update(src,dst, changes=[]):
                 shutil.copy2(srcpath, dst)
             if os.path.isdir(srcpath):
                 shutil.copytree(srcpath, dst+'/'+item)
-                changes.append((dst+'/'+item, "copy"))
+            changes[dst+'/'+item] = "copy"
 
 
         # Item is in src and dst. If file, update if most recent. If directory update dst's version.
@@ -46,7 +45,7 @@ def update(src,dst, changes=[]):
             if os.path.isfile(srcpath):
                 if isFileMoreRecent(srcpath, dst+'/'+item):
                     shutil.copy2(srcpath, dst)
-                    changes.append((dst + '/' + item, "mod"))
+                    changes[dst+'/'+item] = "mod"
             else:
                 update(srcpath, dst + '/' + item)
 
@@ -115,7 +114,7 @@ def date_of_last(path):
 
 def populate_list_of_subdirectories(dir,list):
     for file in os.listdir(dir):
-        path = dir+"'/'"+file
+        path = dir+"/"+file
         list.append(path)
         if os.path.isdir(path):
             populate_list_of_subdirectories(path,list)

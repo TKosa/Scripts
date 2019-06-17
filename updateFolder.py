@@ -28,16 +28,17 @@ class Application(Frame):
             runBtn.config(text='Error: dst is IN src')
             return
 
-        runBtn.config(text='Running')
+        #runBtn.config(text='Running')
 
-        changes = update(src, dst)
+        changes = {}
+        update(src, dst, changes)
         print(changes)
 
         try:
             self.output_frame.destroy()
         except AttributeError:
             pass
-        self.output_frame = OutputFrame(self, src, dst)
+        self.output_frame = OutputFrame(self, dst, changes)
         self.output_frame.pack(fill=X)
 
 
@@ -79,10 +80,10 @@ class InputFrame(Frame):
 class OutputFrame(Frame):
     #Container for both viewer widgets
 
-    def __init__(self, master, folder):
+    def __init__(self, master, folder, changes={}):
         super().__init__(master, bg="white")
 
-        self.FV = self.FolderViewer(self, folder)
+        self.FV = self.FolderViewer(self, folder, changes)
 
 
     class FolderViewer():
@@ -92,7 +93,7 @@ class OutputFrame(Frame):
             removed files shown in red, added in green, modified in yellow
 
         """
-        def __init__(self, master, path):
+        def __init__(self, master, path, changes):
             self.master=master
 
             list_of_subdirs = []
@@ -100,15 +101,12 @@ class OutputFrame(Frame):
             rowNum = 0
 
             for file in list_of_subdirs:
-                self.addEntry(file, rowNum)
+                newEntry  = self.Entry(self.master, file, rowNum, changes)
+
                 rowNum += 1
 
-        def addEntry(self, path, rowNum):
-            self.Entry(self.master, path, rowNum)
-            #self.master.rowconfigure(rowNum,weight=1)
-
         class Entry:
-            def __init__(self, master, path, rowNum, spaces=0):
+            def __init__(self, master, path, rowNum, changes, spaces=0):
                 filename = os.path.basename(path)
 
                 # Button to display filetype (file or directory), and to expand/collapse if dir
@@ -116,17 +114,22 @@ class OutputFrame(Frame):
                 if os.path.isdir(path):
                     self.button['image'] = closedFolderImage
                 elif os.path.isfile(path):
+                    print("file")
                     self.button['image'] = fileImage
-                self.button.grid(row=rowNum, column=0, sticky=W)
+                self.button.grid(row=rowNum, column=0, sticky="W")
 
-                #print("button", path, rowNum, 2*colNum)
+                self.filenameLabel = Label(master, text=filename, bg="white")
+                self.filenameLabel.grid(row=rowNum,column=1, sticky="EW")
+                change = changes.get(path)
+                if changes is not None:
+                    if change == "remove":
+                        self.filenameLabel.configure(fg="red")
+                    if change == "copy":
+                        self.filenameLabel.configure(fg="green")
+                    if change == "mod":
+                        self.filenameLabel.configure(fg="orange")
 
 
-                #filename label
-                self.nameLabel = Label(master, text=filename, bg="white")
-                self.nameLabel.grid(row=rowNum,column=1, sticky="EW")
-                #self.nameLabel.grid_columnconfigure(4*colNum+1,weight=1)
-                #print("Label", path, rowNum, 2*colNum+1)
 
 
 if __name__=="__main__":
