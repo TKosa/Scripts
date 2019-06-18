@@ -107,8 +107,12 @@ class OutputFrame(Frame):
                 path = root+'/'+file
                 newEntry  = self.Entry(self.master, path, self.rowNum, changes, spaces)
                 self.rowNum += 1
-                if(os.path.isdir(path)):
+                try:
+                    check_is_folder = dir_state[path]
                     self.addEntries(path, dir_state, changes, spaces+2)
+                except KeyError:
+                    pass
+
 
 
         class Entry:
@@ -134,7 +138,13 @@ class OutputFrame(Frame):
                     if change == "mod":
                         self.filenameLabel.configure(fg="orange")
 
-
+def test():
+    src = "C:/Users/Thomas/Desktop/github/Update-Folder/testA"
+    dst = "C:/Users/Thomas/Desktop/github/Update-Folder/testB"
+    state_dict = {}
+    change_dict = {}
+    populate_statedict(dst, state_dict)
+    update(src, dst, state_dict, change_dict)
 
 
 if __name__=="__main__":

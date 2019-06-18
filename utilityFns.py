@@ -10,7 +10,7 @@ def update(src,dst, statedict={}, changelist={}):
 
           src (str): directory path
           dst (str): directory path
-          dict (list): optional dict in which dict are recorded. dict[path] is array of arrays [str:dir_ent,str:stat] 
+          dict (list): optional dict in which dict are recorded. dict[path] is array of arrays [str:dir_ent,str:stat]
             stat =  "remove"/"copy"/"mod"
     """
     if not is_valid(src,dst):
@@ -25,8 +25,8 @@ def update(src,dst, statedict={}, changelist={}):
         srcfiles = list(os.listdir(src))
         if item not in srcfiles:
                 dstpath = dst+'/'+item
-                remove(dstpath)
-                changelist[dstpath] = "remove"
+                remove(dstpath, changelist)
+
 
     # If the item is in src but not dst, copy it over
     for item in os.listdir(src):
@@ -69,7 +69,6 @@ def is_valid(src,dst):
 def isFileMoreRecent(filePath,toCompareWithPath):
 
     diff = os.stat(filePath).st_mtime - os.stat(toCompareWithPath).st_mtime
-    print(filePath, diff)
     if diff > 0:
         return True
 
@@ -85,16 +84,17 @@ def get_path_input(msg):
             print("path has been selected")
             return path
 
-def remove(path):
+def remove(path, change_list={}):
     """Remove file or folder from PC."""
-    global dict
     try:
         if os.path.isfile(path):
             os.remove(path)
+            change_list[path] = "remove"
         if os.path.isdir(path):
             for y in os.listdir(path):
-                remove(path+"'/'"+y)
+                remove(path+"/"+y, change_list)
             os.rmdir(path)
+            change_list[path] = "remove"
 
     except:
         print("Could not remove " + path)
