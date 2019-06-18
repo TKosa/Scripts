@@ -2,7 +2,6 @@ import os
 from utilityFns import *
 from tkinter import *
 from tkinter.filedialog import askdirectory
-from scrolledWindow import ScrolledWindow
 
 src = "C:/Users/Thomas/Desktop/github/Update-Folder/testA"
 dst = "C:/Users/Thomas/Desktop/github/Update-Folder/testB"
