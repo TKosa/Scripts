@@ -2,6 +2,8 @@ import os
 from utilityFns import *
 from tkinter import *
 from tkinter.filedialog import askdirectory
+from scrolledWindow import ScrolledWindow
+
 src = "C:/Users/Thomas/Desktop/github/Update-Folder/testA"
 dst = "C:/Users/Thomas/Desktop/github/Update-Folder/testB"
 
@@ -10,6 +12,7 @@ class Application(Frame):
         super().__init__(master)
         self.master = master
         self.input_frame = InputFrame(self)
+        self.input_frame.grid()
         self.output_frame=None
 
         #TODO add event log
@@ -42,7 +45,6 @@ class Application(Frame):
         except AttributeError:
             pass
         self.output_frame = OutputFrame(self, dst, state_dict, change_dict)
-        self.output_frame.pack(fill=X)
 
 
 
@@ -54,27 +56,26 @@ class InputFrame(Frame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.src_row = self.SelectDirectoryRow(self, "Set Src", "C:/Users/Thomas/Desktop/github/Update-Folder/testA")
-        self.dst_row = self.SelectDirectoryRow(self, "Set Dst", "C:/Users/Thomas/Desktop/github/Update-Folder/testB")
+        self.src_row = self.SelectDirectoryRow(self, 0, "Set Src", "C:/Users/Thomas/Desktop/github/Update-Folder/testA")
+        self.dst_row = self.SelectDirectoryRow(self, 1, "Set Dst", "C:/Users/Thomas/Desktop/github/Update-Folder/testB")
 
         self.runBtn = Button(self, text="Run", command=master.run)
-        self.runBtn.pack()
+        self.runBtn.grid(row=2)
 
-        self.pack()
 
     class SelectDirectoryRow(Frame):
         # A frame with a button and label. On button click, user selects directory, which then appears in label.
 
-        def __init__(self, master, btntext="", labeltext=""):
+        def __init__(self, master, row, btntext="", labeltext=""):
             super().__init__(master)
 
             self.label = Label(self, text=labeltext, bg="white")
-            self.label.pack(padx=5, side=LEFT)
+            self.label.grid(row=row, column=0, sticky='w')
 
             self.button = Button(self, text=btntext, command=self.onClick)
-            self.button.pack(side=LEFT)
+            self.button.grid(row=row, column=1, sticky='w')
 
-            self.pack(fill=X)
+            self.grid(row=row)
 
         def onClick(self):
             self.label.config(text=askdirectory())
@@ -87,6 +88,7 @@ class OutputFrame(Frame):
         super().__init__(master, bg="white")
 
         self.FV = self.FolderViewer(self, root, dirstate, changes)
+        self.grid(column=0, sticky="ew")
 
 
     class FolderViewer():
@@ -101,18 +103,17 @@ class OutputFrame(Frame):
             self.rowNum = 0
             self.addEntries(root, dir_state, changes)
 
-        def addEntries(self, root, dir_state, changes, spaces = 0):
-            #str dir: path of directory
-            for file in dir_state[root]:
-                path = root+'/'+file
-                newEntry  = self.Entry(self.master, path, self.rowNum, changes, spaces)
+        def addEntries(self, path, dir_state, changes, spaces = 0):
+            # Adds file/folder at path, and all subdirectories, to output frame
+            for file in dir_state[path]:
+                newpath = path+'/'+file
+                self.Entry(self.master, newpath, self.rowNum, changes, spaces)
                 self.rowNum += 1
                 try:
-                    check_is_folder = dir_state[path]
-                    self.addEntries(path, dir_state, changes, spaces+2)
+                    check_is_folder = dir_state[newpath] #Will throw error if <path> is not folder
+                    self.addEntries(newpath, dir_state, changes, spaces+2)
                 except KeyError:
                     pass
-
 
 
         class Entry:
@@ -128,7 +129,7 @@ class OutputFrame(Frame):
                 #self.button.grid(row=rowNum, column=0, sticky="W")
 
                 self.filenameLabel = Label(master, text=" "*spaces+filename, bg="white")
-                self.filenameLabel.grid(row=rowNum,column=1, sticky="W")
+                self.filenameLabel.grid(row=rowNum,column=0, sticky="W")
                 change = changes.get(path)
                 if changes is not None:
                     if change == "remove":
