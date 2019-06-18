@@ -30,15 +30,18 @@ class Application(Frame):
 
         #runBtn.config(text='Running')
 
-        changes = {}
-        update(src, dst, changes)
-        print(changes)
+
+
+        state_dict = {} #Key is path, item is array of dirents
+        change_dict = {}
+        populate_statedict(dst, state_dict)
+        update(src, dst, state_dict, change_dict)
 
         try:
             self.output_frame.destroy()
         except AttributeError:
             pass
-        self.output_frame = OutputFrame(self, dst, changes)
+        self.output_frame = OutputFrame(self, dst, state_dict, change_dict)
         self.output_frame.pack(fill=X)
 
 
@@ -80,10 +83,10 @@ class InputFrame(Frame):
 class OutputFrame(Frame):
     #Container for both viewer widgets
 
-    def __init__(self, master, folder, changes={}):
+    def __init__(self, master, root, dirstate, changes={}):
         super().__init__(master, bg="white")
 
-        self.FV = self.FolderViewer(self, folder, changes)
+        self.FV = self.FolderViewer(self, root, dirstate, changes)
 
 
     class FolderViewer():
@@ -93,33 +96,35 @@ class OutputFrame(Frame):
             removed files shown in red, added in green, modified in yellow
 
         """
-        def __init__(self, master, path, changes):
+        def __init__(self, master, root, dir_state, changes):
             self.master=master
+            self.rowNum = 0
+            self.addEntries(root, dir_state, changes)
 
-            list_of_subdirs = []
-            populate_list_of_subdirectories(path, list_of_subdirs)
-            rowNum = 0
+        def addEntries(self, root, dir_state, changes, spaces = 0):
+            #str dir: path of directory
+            for file in dir_state[root]:
+                path = root+'/'+file
+                newEntry  = self.Entry(self.master, path, self.rowNum, changes, spaces)
+                self.rowNum += 1
+                if(os.path.isdir(path)):
+                    self.addEntries(path, dir_state, changes, spaces+2)
 
-            for file in list_of_subdirs:
-                newEntry  = self.Entry(self.master, file, rowNum, changes)
-
-                rowNum += 1
 
         class Entry:
             def __init__(self, master, path, rowNum, changes, spaces=0):
                 filename = os.path.basename(path)
 
                 # Button to display filetype (file or directory), and to expand/collapse if dir
-                self.button = Button(master)
-                if os.path.isdir(path):
-                    self.button['image'] = closedFolderImage
-                elif os.path.isfile(path):
-                    print("file")
-                    self.button['image'] = fileImage
-                self.button.grid(row=rowNum, column=0, sticky="W")
+                # self.button = Button(master)
+                # if os.path.isdir(path):
+                #     self.button['image'] = closedFolderImage
+                # elif os.path.isfile(path):
+                #     self.button['image'] = fileImage
+                #self.button.grid(row=rowNum, column=0, sticky="W")
 
-                self.filenameLabel = Label(master, text=filename, bg="white")
-                self.filenameLabel.grid(row=rowNum,column=1, sticky="EW")
+                self.filenameLabel = Label(master, text=" "*spaces+filename, bg="white")
+                self.filenameLabel.grid(row=rowNum,column=1, sticky="W")
                 change = changes.get(path)
                 if changes is not None:
                     if change == "remove":

@@ -4,14 +4,14 @@ import os,shutil
  has gone up to the next integer """
 
 
-def update(src,dst, changes=[]):
+def update(src,dst, statedict={}, changelist={}):
     """Updates directory dst from src. Recursively copies all subdirectories and files of src if they are not in dst or are out of date.
        Also removes files in dst that are not in src.
 
           src (str): directory path
           dst (str): directory path
-          changes (list): optional list in which changes are recorded as tuple 
-          ( path,  "remove"/"copy"/"mod")
+          dict (list): optional dict in which dict are recorded. dict[path] is array of arrays [str:dir_ent,str:stat] 
+            stat =  "remove"/"copy"/"mod"
     """
     if not is_valid(src,dst):
         return
@@ -26,7 +26,7 @@ def update(src,dst, changes=[]):
         if item not in srcfiles:
                 dstpath = dst+'/'+item
                 remove(dstpath)
-                changes[dstpath] = "remove"
+                changelist[dstpath] = "remove"
 
     # If the item is in src but not dst, copy it over
     for item in os.listdir(src):
@@ -37,19 +37,18 @@ def update(src,dst, changes=[]):
                 shutil.copy2(srcpath, dst)
             if os.path.isdir(srcpath):
                 shutil.copytree(srcpath, dst+'/'+item)
-            changes[dst+'/'+item] = "copy"
+            add_to_statedict(statedict, dst, item)
+            changelist[dst+'/'+item]="copy"
 
 
         # Item is in src and dst. If file, update if most recent. If directory update dst's version.
         else:
             if os.path.isfile(srcpath):
-                if isFileMoreRecent(srcpath, dst+'/'+item):
+                if isFileMoreRecent( dst+'/'+item, srcpath):
                     shutil.copy2(srcpath, dst)
-                    changes[dst+'/'+item] = "mod"
+                    changelist[dst+'/'+item] = "mod"
             else:
                 update(srcpath, dst + '/' + item)
-
-    return changes
 
 def is_valid(src,dst):
     if not os.path.exists(src) or not os.path.exists(dst):
@@ -68,8 +67,12 @@ def is_valid(src,dst):
 
 
 def isFileMoreRecent(filePath,toCompareWithPath):
-    if os.stat(filePath).st_mtime - os.stat(toCompareWithPath).st_mtime > 0:
+
+    diff = os.stat(filePath).st_mtime - os.stat(toCompareWithPath).st_mtime
+    print(filePath, diff)
+    if diff > 0:
         return True
+
     return False
 
 def get_path_input(msg):
@@ -84,16 +87,14 @@ def get_path_input(msg):
 
 def remove(path):
     """Remove file or folder from PC."""
-    global changes
+    global dict
     try:
         if os.path.isfile(path):
             os.remove(path)
-            changes.append(("f", path, "remove"))
         if os.path.isdir(path):
             for y in os.listdir(path):
                 remove(path+"'/'"+y)
             os.rmdir(path)
-            changes.append(("d", path, "remove"))
 
     except:
         print("Could not remove " + path)
@@ -112,9 +113,23 @@ def date_of_last(path):
         else:
             return 0
 
-def populate_list_of_subdirectories(dir,list):
+def populate_statedict(dir,dict):
+    """
+    Populates dict so dict[path] = list of entries in path
+    :str dir: Path of directory
+    :dict dict: Dictionary to write into
+    :return: None
+    """
+    dict[dir]=[]
     for file in os.listdir(dir):
         path = dir+"/"+file
-        list.append(path)
+        add_to_statedict(dict,dir,file)
         if os.path.isdir(path):
-            populate_list_of_subdirectories(path,list)
+            populate_statedict(path,dict)
+
+def add_to_statedict(dict,path,item):
+    if path not in dict.keys():
+        dict[path] = []
+    array = dict[path]
+    if item not in array:
+        array.append(item)
