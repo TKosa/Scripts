@@ -26,6 +26,8 @@ def update(src,dst, statedict={}, changelist={}):
         if item not in srcfiles:
                 dstpath = dst+'/'+item
                 remove(dstpath, changelist)
+        if os.path.isdir(dst + '/' + item):
+            update(src+'/'+item, dst+'/'+item,statedict,changelist)
 
 
     # If the item is in src but not dst, copy it over

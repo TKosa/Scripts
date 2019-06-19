@@ -3,19 +3,20 @@ from utilityFns import *
 from tkinter import *
 from tkinter.filedialog import askdirectory
 
-src = "C:/Users/Thomas/Desktop/github/Update-Folder/testA"
-dst = "C:/Users/Thomas/Desktop/github/Update-Folder/testB"
+global src,dst
+src = "C:\\UF-Demo\\Master"
+dst = "C:\\UF-Demo\\Copy"
 
 class Application(Frame):
     def __init__(self, master=None):
-        super().__init__(master)
+        super().__init__(master, bg="white")
         self.master = master
         self.input_frame = InputFrame(self)
         self.input_frame.grid()
         self.output_frame=None
 
         #TODO add event log
-        self.grid(sticky="news")
+        self.pack(fill=X)
 
     def run(self):
         src = self.input_frame.src_row.label.cget("text")
@@ -53,28 +54,28 @@ class Application(Frame):
 
 class InputFrame(Frame):
     def __init__(self, master):
-        super().__init__(master)
-
-        self.src_row = self.SelectDirectoryRow(self, 0, "Set Src", "C:/Users/Thomas/Desktop/github/Update-Folder/testA")
-        self.dst_row = self.SelectDirectoryRow(self, 1, "Set Dst", "C:/Users/Thomas/Desktop/github/Update-Folder/testB")
+        super().__init__(master, bg="white")
+        global src, dst
+        self.src_row = self.SelectDirectoryRow(self, 0, "Set Src", src)
+        self.dst_row = self.SelectDirectoryRow(self, 1, "Set Dst", dst)
 
         self.runBtn = Button(self, text="Run", command=master.run)
-        self.runBtn.grid(row=2)
+        self.runBtn.pack(fill=X)
 
 
     class SelectDirectoryRow(Frame):
         # A frame with a button and label. On button click, user selects directory, which then appears in label.
 
         def __init__(self, master, row, btntext="", labeltext=""):
-            super().__init__(master)
+            super().__init__(master, bg="white")
 
             self.label = Label(self, text=labeltext, bg="white")
-            self.label.grid(row=row, column=0, sticky='w')
+            self.label.pack(side=LEFT)
 
             self.button = Button(self, text=btntext, command=self.onClick)
-            self.button.grid(row=row, column=1, sticky='w')
+            self.button.pack(side=RIGHT)
 
-            self.grid(row=row)
+            self.pack(fill=X)
 
         def onClick(self):
             self.label.config(text=askdirectory())
@@ -100,6 +101,8 @@ class OutputFrame(Frame):
         def __init__(self, master, root, dir_state, changes):
             self.master=master
             self.rowNum = 0
+            print(dir_state)
+            print(changes)
             self.addEntries(root, dir_state, changes)
 
         def addEntries(self, path, dir_state, changes, spaces = 0):
@@ -118,15 +121,6 @@ class OutputFrame(Frame):
         class Entry:
             def __init__(self, master, path, rowNum, changes, spaces=0):
                 filename = os.path.basename(path)
-
-                # Button to display filetype (file or directory), and to expand/collapse if dir
-                # self.button = Button(master)
-                # if os.path.isdir(path):
-                #     self.button['image'] = closedFolderImage
-                # elif os.path.isfile(path):
-                #     self.button['image'] = fileImage
-                #self.button.grid(row=rowNum, column=0, sticky="W")
-
                 self.filenameLabel = Label(master, text=" "*spaces+filename, bg="white")
                 self.filenameLabel.grid(row=rowNum,column=0, sticky="W")
                 change = changes.get(path)
@@ -151,11 +145,5 @@ if __name__=="__main__":
     # This version is for desktop
     root = Tk()
     root.title("Update-Folder")
-
-    global fileImage, closedFolderImage, openFolderImage
-    fileImage = PhotoImage(file="./res/file.png")
-    closedFolderImage = PhotoImage(file="./res/closed_folder.png")
-    openFolderImage = PhotoImage(file="./res/open_folder.png")
-
     app = Application(master=root)
     root.mainloop()
