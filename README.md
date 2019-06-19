@@ -10,4 +10,4 @@ If a file is in dest but NOT in src, it will remove the file from dest so the tw
 
 In the GUI, modified files are orange, deleted files are red, added files are green.
 
-<img src="https://github.com/TKosa/Update-Folder/blob/master/img.png" width="500">
+<img src="https://github.com/TKosa/Update-Folder/blob/master/img.png" width="122" height="176">
